@@ -9,7 +9,8 @@
 $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host  = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
 $base  = $proto . '://' . $host;
-$img   = $base . '/site_preview.png';
+$img_version = file_exists(__DIR__ . '/../site_preview.png') ? filemtime(__DIR__ . '/../site_preview.png') : time();
+$img   = $base . '/site_preview.png?v=' . $img_version;
 $url   = $base . '/';
 
 // ── Token info — auto-patched by update-theme.html on every rebrand ──
@@ -45,6 +46,10 @@ $html = preg_replace('/<meta\s+name="twitter:image"\s+content="[^"]*"/i',
     '<meta name="twitter:image" content="' . htmlspecialchars($img, ENT_QUOTES) . '"', $html);
 $html = preg_replace('/<meta\s+name="twitter:image:alt"\s+content="[^"]*"/i',
     '<meta name="twitter:image:alt" content="' . htmlspecialchars($alt, ENT_QUOTES) . '"', $html);
+$html = preg_replace('/<meta\s+name="twitter:domain"\s+content="[^"]*"/i',
+    '<meta name="twitter:domain" content="' . htmlspecialchars($host, ENT_QUOTES) . '"', $html);
+$html = preg_replace('/<meta\s+name="twitter:url"\s+content="[^"]*"/i',
+    '<meta name="twitter:url" content="' . htmlspecialchars($url, ENT_QUOTES) . '"', $html);
 
 header('Content-Type: text/html; charset=utf-8');
 echo $html;
